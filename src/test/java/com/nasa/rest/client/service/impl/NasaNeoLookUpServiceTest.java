@@ -1,5 +1,6 @@
 package com.nasa.rest.client.service.impl;
 
+import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -8,10 +9,74 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 
-public class TestNeoLookUp {
+public class NasaNeoLookUpServiceTest {
 	private static final String FEED_BASE_URL_HTTPS = "https://api.nasa.gov/neo/rest/v1/feed";
 	private static final String API_KEY = "uPHcU8J6Rzt3uF8mqv5y4oMvhGusOhp4kmtTLkRC";
 	public static final String START_DATE = "2020-01-01";
+
+	@Test
+	public void test_without_startDate_bad_request() {
+		given()
+
+			.param("end_date", "2020-01-02")
+			.param("api_key", API_KEY)
+			.when()
+			.get(FEED_BASE_URL_HTTPS)
+			.then()
+			.assertThat()
+			.statusCode(HttpStatus.SC_BAD_REQUEST);
+
+	}
+
+	//if we don't provide any start and end date then it will still find for a week data
+	@Test
+	public void test_without_start_end_date_valid_data() {
+		given()
+
+			.param("api_key", API_KEY)
+			.when()
+			.get(FEED_BASE_URL_HTTPS)
+			.then()
+			.assertThat()
+			.statusCode(HttpStatus.SC_OK)
+
+
+		;
+
+	}
+
+	@Test
+	public void test_invalid_api_key() {
+		Response response = given()
+
+			.param("api_key", "gibberKEY")
+			.when()
+			.get(FEED_BASE_URL_HTTPS);
+		response.then()
+			.assertThat()
+			.statusCode(HttpStatus.SC_FORBIDDEN)
+			.body("error.code", Matchers.equalTo("API_KEY_INVALID"))
+
+		;
+
+
+	}
+
+	@Test
+	public void test_without_api_key() {
+		Response response = given()
+
+			.when()
+			.get(FEED_BASE_URL_HTTPS);
+		response.then()
+			.assertThat()
+			.statusCode(HttpStatus.SC_FORBIDDEN)
+			.body("error.code", Matchers.equalTo("API_KEY_MISSING"))
+
+		;
+
+
+	}
 
 	@Test
 	public void testNeoFeed_valid_dates() {
