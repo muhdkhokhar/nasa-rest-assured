@@ -1,5 +1,6 @@
-package com.nasa.rest.client.service.impl;
+package com.nasa.rest.tests;
 
+import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
 import org.hamcrest.Matchers;
@@ -9,49 +10,48 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 
-public class NasaNeoLookUpServiceTest {
-	private static final String FEED_BASE_URL_HTTPS = "https://api.nasa.gov/neo/rest/v1/feed";
-	private static final String API_KEY = "uPHcU8J6Rzt3uF8mqv5y4oMvhGusOhp4kmtTLkRC";
-	public static final String START_DATE = "2020-01-01";
+public class NasaNeoFeedRestServiceTest extends NasaAbstractTest {
 
+	//This test case check if we don't provide the start date
+	//result: The api will fail and return BAD Request response
 	@Test
 	public void test_without_startDate_bad_request() {
-		given()
-
-			.param("end_date", "2020-01-02")
+		RestAssured.given()
+			.param("end_date", END_DATE)
 			.param("api_key", API_KEY)
 			.when()
-			.get(FEED_BASE_URL_HTTPS)
+			.get(NEO_FEED_URL)
 			.then()
 			.assertThat()
 			.statusCode(HttpStatus.SC_BAD_REQUEST);
 
 	}
 
-	//if we don't provide any start and end date then it will still find for a week data
+	//if we don't provide  start and end date
+	//it will give you result with status ok
 	@Test
 	public void test_without_start_end_date_valid_data() {
 		given()
 
 			.param("api_key", API_KEY)
 			.when()
-			.get(FEED_BASE_URL_HTTPS)
+			.get(NEO_FEED_URL)
 			.then()
 			.assertThat()
-			.statusCode(HttpStatus.SC_OK)
-
-
-		;
+			.statusCode(HttpStatus.SC_OK);
 
 	}
 
+	//if I provide wrong api KEY
+	//it will not allow me to access the api with respone FORBIDDEN
+	//the body will have error with code api key invalid
 	@Test
 	public void test_invalid_api_key() {
 		Response response = given()
 
 			.param("api_key", "gibberKEY")
 			.when()
-			.get(FEED_BASE_URL_HTTPS);
+			.get(NEO_FEED_URL);
 		response.then()
 			.assertThat()
 			.statusCode(HttpStatus.SC_FORBIDDEN)
@@ -62,12 +62,15 @@ public class NasaNeoLookUpServiceTest {
 
 	}
 
+	//if I don't provide any API KEY
+	//it will be forbidden
+	// error code is api key missing
 	@Test
 	public void test_without_api_key() {
 		Response response = given()
 
 			.when()
-			.get(FEED_BASE_URL_HTTPS);
+			.get(NEO_FEED_URL);
 		response.then()
 			.assertThat()
 			.statusCode(HttpStatus.SC_FORBIDDEN)
@@ -78,6 +81,9 @@ public class NasaNeoLookUpServiceTest {
 
 	}
 
+	//if I provide valid parameter
+	//then it will with come OK response
+	// data will be validated.
 	@Test
 	public void testNeoFeed_valid_dates() {
 
@@ -86,16 +92,13 @@ public class NasaNeoLookUpServiceTest {
 
 
 		given().param("start_date", START_DATE)
-			.param("end_date", "2020-01-02")
+			.param("end_date", END_DATE)
 			.param("api_key", API_KEY)
 			.when()
-			.get(FEED_BASE_URL_HTTPS)
+			.get(NEO_FEED_URL)
 			.then()
 			.assertThat()
 			.statusCode(HttpStatus.SC_OK)
-			.header("Server", "openresty")
-			.header("Content-Type", "application/json;charset=UTF-8")
-			.header("Connection", "keep-alive")
 			.body("element_count", equalTo(31))
 			.body("near_earth_objects.size()", Matchers.is(2))
 			.body("near_earth_objects.get('2020-01-01').size()", Matchers.is(12))
