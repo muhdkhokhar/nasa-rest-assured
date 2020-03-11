@@ -9,7 +9,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 
-public class NasaBrowserRestServiceTest extends NasaAbstractTest {
+public class NasaBrowseRestServiceTest extends NasaAbstractTest {
 
 
 	@Test

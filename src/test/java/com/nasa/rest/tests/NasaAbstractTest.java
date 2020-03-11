@@ -8,6 +8,9 @@ public abstract class NasaAbstractTest {
 
 
 	protected static final String NEO_FEED_URL = "https://api.nasa.gov/neo/rest/v1/feed";
+
+	//path variable
+	//Rest assured use {} to pass any path variables.
 	protected static final String NEO_LOOKUP_URL = "https://api.nasa.gov/neo/rest/v1/neo/{asteriodId}";
 	protected static final String NEO_BROWSE_URL = "https://api.nasa.gov/neo/rest/v1/neo/browse";
 
