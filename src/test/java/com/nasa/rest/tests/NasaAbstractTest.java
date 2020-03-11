@@ -8,8 +8,8 @@ public abstract class NasaAbstractTest {
 
 
 	protected static final String NEO_FEED_URL = "https://api.nasa.gov/neo/rest/v1/feed";
-
 	protected static final String NEO_LOOKUP_URL = "https://api.nasa.gov/neo/rest/v1/neo/{asteriodId}";
+	protected static final String NEO_BROWSE_URL = "https://api.nasa.gov/neo/rest/v1/neo/browse";
 
 	protected static final String API_KEY = "uPHcU8J6Rzt3uF8mqv5y4oMvhGusOhp4kmtTLkRC";
 	protected static final String START_DATE = "2020-01-01";
